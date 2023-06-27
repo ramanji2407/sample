@@ -5,7 +5,7 @@ select id from salary as s1 where 3-1=(select count(*) from salary as s2 where s
 select * from employee inner join salary on employee.id=salary.id where salary.id=(select id from salary as s1 where 3-1=(select count(*) from salary as s2 where s1.Salary<s2.Salary));
 /*procedureforabovejoin*/
 
-delimiter//
+delimiter
 create procedure nthsalaryfind(in nthsalary int)
 begin
 select * from employee inner join salary on employee.id=salary.id where salary.id=(select id from salary as s1 where nthsalary-1=(select count(*) from salary as s2 where s1.Salary<s2.Salary));
