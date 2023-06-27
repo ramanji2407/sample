@@ -1,0 +1,143 @@
+SELECT * FROM salary where id=9;
+insert into salary values(1,500000),(2,500000),(3,650000),(4,1000000),(5,1100000),(6,1259000),(7,600000),(8,1000000),(9,1500000),(10,2500000),(11,5000000);
+/*joins*/
+select id from salary as s1 where 3-1=(select count(*) from salary as s2 where s1.Salary<s2.Salary);
+select * from employee inner join salary on employee.id=salary.id where salary.id=(select id from salary as s1 where 3-1=(select count(*) from salary as s2 where s1.Salary<s2.Salary));
+/*procedureforabovejoin*/
+
+delimiter //
+create procedure nthsalaryfind(in nthsalary int)
+begin
+select * from employee inner join salary on employee.id=salary.id where salary.id=(select id from salary as s1 where nthsalary-1=(select count(*) from salary as s2 where s1.Salary<s2.Salary));
+
+end; 
+//
+call nthsalaryfind(2);
+
+select a.pincode ,a.state ,e.Firstname,e.Lastname ,s.salary from employee as e inner join adress as a on e.id=a.id 
+inner join salary as s on e.id=s.id where e.Firstname like '%b%';
+
+select concat(e.Firstname,e.Lastname),d.Designationname, department.Departmentname,employmenttype.Employeetype ,s.salary
+from employee as e 
+ inner join designation as d on e.Designationid=d.Id 
+inner join department on e.Departmentid = department.Id inner join employmenttype on e.Employementid=employmenttype.id inner join  salary as s on e.id=s.id ;
+
+
+select concat(e.Firstname,e.Lastname),d.Departmentname from employee as e  inner join department as d on e.Departmentid=d.Id;
+
+selfjoin
+select e2.id, concat(e2.Firstname,e2.Lastname),concat(e1.Firstname,e1.Lastname) as line1managerofemployee  from employee as e1 join employee as e2 where e1.id =e2.L1manager
+select e2.id, concat(e2.Firstname,e2.Lastname),concat(e1.Firstname,e1.Lastname) as line2managerofemployee  from employee as e1 join employee as e2 where e1.id =e2.L2manager
+Leftjoins
+select *from Employee left join Department on Employee.Departmentid = Department.Id;
+select *from Employee left  join Designation on Employee.Designationid = Designation.Id;
+select *from Employee left join Employmenttype on Employee.Employementid = Employmenttype.Id;
+select *from  Employee left join Salary ON Employee.Id = Salary.Id;
+
+select * from Department right join Employee on Department.Id = Employee.Departmentid;
+
+DELIMITER //
+
+create procedure PartialSearchEmployee(in PartialsearchValue varchar(100))
+begin
+    set partialsearchValue = CONCAT('%', PartialsearchValue, '%');
+
+    select *
+    from Employee
+    where Id like partialsearchValue
+        or Firstname like partialsearchValue
+        or Lastname like partialsearchValue
+        or Email like partialsearchValue
+        or Phoneno like partialsearchValue
+        or Gender like partialsearchValue
+        or Dateofbirth like partialsearchValue
+        or Employementid like partialsearchValue
+        or Departmentid like partialsearchValue
+        or Designationid like partialsearchValue
+        or L1manager like partialsearchValue
+        or  L2Manager like partialsearchValue;
+END //
+DELIMITER ;
+
+alter table logtable
+drop column LogId;
+call PartialSearchEmployee('2000');
+
+delimiter //
+CREATE TRIGGER UpdateEmployeeLog
+AFTER UPDATE ON Employee
+FOR EACH ROW
+BEGIN
+    INSERT INTO LogTable (EmployeeId, LogDate)
+    VALUES (NEW.Id, NOW());
+END;
+//
+select * from logtable;
+
+update employee set id=11 where id=14;
+
+
+drop trigger UpdateEmployeeLog;
+
+
+
+
+create database EMS;
+USE EMS;
+CREATE TABLE Employee(Id int primary key, Firstname varchar(30), Lastname varchar(60),Email varchar(90) not null, Phoneno int not null,Gender varchar(1)not null,Dateofbirth date,
+ Employementid int, foreign key(Employementid) references Employmenttype(Id)  on delete cascade on update cascade,Departmentid int,foreign key(Departmentid) references department(Id) on delete cascade on update cascade, 
+Designationid int, foreign key (Designationid) references designation(Id) on delete cascade on update cascade,L1manager int, L2Manager int  );
+select*from Employee;
+select*from designation;
+select*from employmenttype;
+select*from salary;
+
+drop table employee;
+alter table employee
+delete from employee where id=1;
+
+modify column Phoneno bigint; 
+create table Department(Id int primary key, Departmentname varchar(50));
+create table Designation(Id int primary key, Designationname varchar(50));
+create table Employmenttype(Id int primary key, Employeetype varchar(60));
+create  table salary(Id int, foreign key (Id) references Employee(Id) on delete cascade on update cascade , Salary decimal(10,2));
+create table adress(Id int, foreign key (Id) references Employee(Id) on delete cascade on update cascade , Adress1 varchar(200),Adress2 varchar(200) ,State varchar(50),pincode int  );
+create table Performence(Id int, foreign key (Id) references Employee(Id) on delete cascade on update cascade ,Evaluationdate date, EvaluatorId int,foreign key (EvaluatorId) references Employee(Id) on delete cascade on update cascade, comments varchar(50)) ;
+insert into employee values (1,'paspuleti','ramanjnaeyulu','pasupuletiramanji3@gmail.com',9392841920,'M','2000-07-24',1,2,3,5,6);
+insert into employee values (11,'jAMES','gosling','jamesg@gmail.com',9879901800,'M','1979-01-25',1,null,10,null,null);
+
+insert into department values(1,'Human Resources'),(2,'IT'),(3,'Accounting'),(4,'Development'),(5,'Production');
+insert into designation values(1,'Hrmanager'),(2,'ExecutiveHr'),(3,'Trainee Engineer'),(4,'Jrdevloper'),(5,'Srdevloper'),(6,' Quality Assurance'),(7,'Manager'),(8,'Bussines Analyst');
+insert into employmenttype values(1,'FullTime'),(2,'Contract');
+
+
+drop table LogTable;
+
+
+CREATE TABLE LogTable (
+    LogId int primary key auto_increment,
+    EmployeeId int,
+    LogDate datetime
+);
+create view displaydetails
+as
+select concat(e.Firstname,e.Lastname),d.Designationname, department.Departmentname,employmenttype.Employeetype ,s.salary
+from employee as e inner join designation as d on e.Designationid=d.Id 
+inner join department on e.Departmentid = department.Id inner join employmenttype on e.Employementid=employmenttype.id inner join  salary as s on e.id=s.id ;
+
+delimiter //
+create procedure dispalydetails ()
+begin
+ select * from displaydetails;
+end  //
+delimiter  ;
+
+
+
+
+
+
+
+
+
+
