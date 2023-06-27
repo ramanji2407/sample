@@ -1,4 +1,4 @@
-USE PRACTICE;
+USE PRACTIC
 CREATE TABLE EMS(ID INT PRIMARY KEY  , F_NAME VARCHAR(40),L_NAME VARCHAR(40),  EMPLOYMENTTYPE VARCHAR(30), Dsignation varchar(50),EMAIL varchar(60),phone_no long);
 
 insert into ems values(11,'CHADALAVADA','KAVYA','PART TIME','INTERN','CHKAVYA455@gmail.com',9887480880,'6000');
@@ -6,9 +6,9 @@ alter table ems
 add column salary decimal(10,2);
 update ems
 set salary=46000
-where id=9;
+where id=8;
 
-select* from  PARTTIMELOG;
+select* from  PARTTIMELO;
 
 CREATE TABLE PARTTIMELOG(ID INT primary KEY , COSTPERHOUR INT, NOOFHOURSWORKED INT, EMPLOYID INT,  FOREIGN KEY (EMPLOYID) REFERENCES ems(ID));
 INSERT INTO PARTTIMELOG VALUES(1,100,50,9),(2,100,59,10),(3,100,60,11);
